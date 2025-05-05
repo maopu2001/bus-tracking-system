@@ -1,9 +1,9 @@
-import QueryClientProviderComponent from '../components/QueryClientProviderComponent';
-import './globals.css';
+import QueryClientProviderComponent from "../components/QueryClientProviderComponent";
+import "./globals.css";
 
 export const metadata = {
-  title: 'Track My Bus - RMSTU',
-  description: 'Created By Team Zero Or One',
+  title: "Track My Bus - RMSTU",
+  description: "Created By Team Zero Or One",
 };
 
 export default function RootLayout({ children }) {
