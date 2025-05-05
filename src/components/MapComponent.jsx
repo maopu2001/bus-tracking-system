@@ -19,73 +19,75 @@ const MapComponent = ({ buses, busLoc, type }) => {
   const mapRef = useRef(null);
   const markersRef = useRef([]);
 
-  console.log(type);
-
   useEffect(() => {
-    if (!mapRef.current) {
-      // Initialize the map
-      mapRef.current = L.map("map").setView(
-        [InitialView.lat, InitialView.lng],
-        InitialView.zoom
-      );
-
-      const varsityIcon = L.icon({
-        iconUrl: "/loc-icon.png",
-        iconSize: [60, 55],
-        iconAnchor: [30, 55],
-        popupAnchor: [0, -60],
-      });
-
-      // Add OpenStreetMap tiles
-      if (type === "carto")
-        L.tileLayer(
-          "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-          { attribution: "© Zero Or One", maxZoom: 18 }
-        ).addTo(mapRef.current);
-      // Add OpenStreetMap tiles
-      else
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: "© Zero Or One",
-          maxZoom: 18,
-        }).addTo(mapRef.current);
-
-      // Add University Location
-      L.marker(UniversityLoc, { icon: varsityIcon })
-        .bindPopup("Rangamati Science and Technology University")
-        .addTo(mapRef.current)
-        .on("click", () => mapRef.current?.setView(UniversityLoc, ZoomIn));
-
-      const HomeButton = L.Control.extend({
-        options: { position: "topright" },
-
-        onAdd: function () {
-          const btn = L.DomUtil.create(
-            "button",
-            "leaflet-bar leaflet-control leaflet-control-custom"
-          );
-          btn.innerHTML =
-            '<svg viewBox="0 -960 960 960" width="24px" fill="#000"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/></svg>';
-          btn.className =
-            "bg-white hover:bg-white/80 rounded-md border-2 border-gray-300 w-10 h-10 grid place-content-center";
-          btn.style.cursor = "pointer";
-          btn.onclick = () => {
-            mapRef.current?.setView(
-              [InitialView.lat, InitialView.lng],
-              InitialView.zoom
-            );
-          };
-
-          return btn;
-        },
-      });
-
-      mapRef.current.addControl(new HomeButton());
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
     }
+    
+    mapRef.current = L.map("map").setView(
+      [InitialView.lat, InitialView.lng],
+      InitialView.zoom
+    );
+
+    const varsityIcon = L.icon({
+      iconUrl: "/loc-icon.png",
+      iconSize: [60, 55],
+      iconAnchor: [30, 55],
+      popupAnchor: [0, -60],
+    });
+
+    if (type === "carto")
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        { attribution: "© Zero Or One", maxZoom: 18 }
+      ).addTo(mapRef.current);
+    else
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© Zero Or One",
+        maxZoom: 18,
+      }).addTo(mapRef.current);
+
+    // Add University Location
+    L.marker(UniversityLoc, { icon: varsityIcon })
+      .bindPopup("Rangamati Science and Technology University")
+      .addTo(mapRef.current)
+      .on("click", () => mapRef.current?.setView(UniversityLoc, ZoomIn));
+
+    const HomeButton = L.Control.extend({
+      options: { position: "topright" },
+
+      onAdd: function () {
+        const btn = L.DomUtil.create(
+          "button",
+          "leaflet-bar leaflet-control leaflet-control-custom"
+        );
+        btn.innerHTML =
+          '<svg viewBox="0 -960 960 960" width="24px" fill="#000"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/></svg>';
+        btn.className =
+          "bg-white hover:bg-white/80 rounded-md border-2 border-gray-300 w-10 h-10 grid place-content-center";
+        btn.style.cursor = "pointer";
+        btn.onclick = () => {
+          mapRef.current?.setView(
+            [InitialView.lat, InitialView.lng],
+            InitialView.zoom
+          );
+        };
+
+        return btn;
+      },
+    });
+
+    mapRef.current.addControl(new HomeButton());
+    updateBusMarkers();
   }, [type]);
 
-  useEffect(() => {
+
+  const updateBusMarkers = () => {
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
+
+    if (!mapRef.current) return;
 
     buses.forEach((bus) => {
       const Info = busLoc.get(bus.id);
@@ -122,6 +124,10 @@ const MapComponent = ({ buses, busLoc, type }) => {
 
       markersRef.current.push(marker);
     });
+  };
+
+  useEffect(() => {
+    updateBusMarkers();
   }, [buses, busLoc]);
 
   return <div id="map" className="h-[500px] w-full " />;

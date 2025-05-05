@@ -3,7 +3,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { FaBus, FaRoute } from "react-icons/fa";
 import { useQuery } from "react-query";
-import { useEffect } from "react";
+import { Switch } from "@/components/ui/switch";
 
 const MapComponent = dynamic(() => import("../components/MapComponent"), {
   ssr: false,
@@ -46,15 +46,29 @@ export default function Home() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2">
-            <div>
-              <label className="text-lg font-semibold mr-4">
-                Select Map Type:
-              </label>
-              <select onChange={(e) => setType(e.target.value)}>
-                <option value="open">OpenStreetMap</option>
-                <option value="carto">Carto Map</option>
-              </select>
-            </div>
+            <label className="flex items-center mb-4 relative z-50 gap-2 cursor-pointer">
+              <span className="font-bold">Select Map Type:</span>
+              <span
+                className={`rounded-md px-2 py-1 ${
+                  type === "open" ? "bg-blue-200" : ""
+                }`}
+              >
+                OpenSreetMap
+              </span>
+              <Switch
+                checked={type === "carto"}
+                onCheckedChange={(checked) =>
+                  setType(checked ? "carto" : "open")
+                }
+              />
+              <span
+                className={`rounded-md px-2 py-1 ${
+                  type === "carto" ? "bg-blue-200" : ""
+                }`}
+              >
+                Carto
+              </span>
+            </label>
 
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               {busesIsFetched && (
